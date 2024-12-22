@@ -2,15 +2,16 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
+const referralCodeGenerator = require('../utils/referral-code-generator');
 
 const UserSchema = mongoose.Schema({
-    fullName: {
+    firstName: {
         type: String,
-        required: [true, 'Please provide your full name']
+        required: [true, 'Please provide your first name']
     },
-    username: {
-        type: String,
-        required: [true, 'Please provide username']
+    lastName: {
+    type: String,
+    required: [true, 'Please provide your last name']
     },
     password: {
         type: String,
@@ -23,7 +24,12 @@ const UserSchema = mongoose.Schema({
         trim: true,
         lowercase: true,
         match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please provide valid email']
-    }
+    },
+    country: String,
+    address: String,
+    phoneNumber: String,
+    profilePicture: String,
+    referralCode: String
 }, {timestamps: true})
 
 
@@ -39,6 +45,7 @@ UserSchema.methods.createJWT =  function () {
 UserSchema.pre('save', async function () {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+    this.referralCode = await referralCodeGenerator();
 })
 
 UserSchema.methods.comparePasswords = async function (userPassword) {
