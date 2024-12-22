@@ -16,7 +16,8 @@ const register = async (req, res) => {
 
     const user = await User.create({username, fullName, email, password});
     const token = user.createJWT()
-
+    user.password = undefined;
+    user.__v = undefined;
     return res.status(StatusCodes.CREATED).json({success: true, code: 201, msg: 'Acount created successfully', data: {user, token}});
 }
 
@@ -29,7 +30,7 @@ const login = async (req, res) => {
       throw new BadRequestError("Please provide email and password to login");
     }
   
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email }).select('-__v');
   
     if (!user) {
       throw new UnauthenticatedError("Invalid email");
@@ -42,7 +43,7 @@ const login = async (req, res) => {
     }
   
     const token = user.createJWT();
-  
+    user.password = undefined;
     return res.status(StatusCodes.OK).json({ success: true, code: 200, msg: 'Login successful', data: {user, token} });
   };
 
