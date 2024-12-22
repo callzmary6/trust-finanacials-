@@ -33,7 +33,7 @@ const login = async (req, res) => {
     const user = await User.findOne({ email: email }).select('-__v');
   
     if (!user) {
-      throw new UnauthenticatedError("Invalid email");
+      throw new UnauthenticatedError("Invalid email", 401);
     }
         
     const isPasswordCorrect = await user.comparePasswords(password);

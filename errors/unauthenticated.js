@@ -7,7 +7,7 @@ class UnauthenticatedError extends CustomAPIError {
     constructor(message) {
         super(message);
         this.statusCode = StatusCodes.UNAUTHORIZED;
-        this.code = 401;
+        this.errCode = 401;
     }
 }
 

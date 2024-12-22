@@ -7,7 +7,7 @@ class NotFoundError extends CustomAPIError {
     constructor(message) {
         super(message);
         this.statusCode = StatusCodes.NOT_FOUND;
-        this.code = 404;
+        this.errCode = 404;
     }
 }
 
