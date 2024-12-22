@@ -9,6 +9,8 @@ const notFoundMiddleware = require('./middlewares/not-found')
 const connectDB = require('./db/connect')
 const authRouter = require('./routes/auth');
 
+const PORT = process.env.PORT || 3000
+
 // CORS SETUP
 const cors = require('cors');
 
@@ -23,7 +25,7 @@ app.use(errorHandlerMiddleware);
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URI)
-        app.listen(3000, () => {
+        app.listen(PORT, () => {
             console.log('Server is active...')
         })
     } catch (error) {
