@@ -12,7 +12,7 @@ const authRouter = require('./routes/auth');
 // CORS SETUP
 const cors = require('cors');
 
-app.use(cors())
+app.use(cors());
 app.use(express.json())
 
 app.use('/api/v1/auth', authRouter);
