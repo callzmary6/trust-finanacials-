@@ -6,14 +6,10 @@ const transporter = require('../utils/transporter');
 const bcrypt = require('bcryptjs')
 
 const register = async (req, res) => {
-    const {firstName, lastName, email, password, password2} = req.body;
+    const {firstName, lastName, email, password, referralCode} = req.body;
 
     if (!firstName || !lastName || !email || !password) {
         throw new BadRequestError('Please provide the necessary fields')
-    }
-
-    if (password !== password2) {
-        throw new BadRequestError('Password mismatch')
     }
 
     const user = await User.create({firstName, lastName, email, password});
@@ -32,7 +28,7 @@ const login = async (req, res) => {
       throw new BadRequestError("Please provide email and password to login");
     }
   
-    const user = await User.findOne({ email: email }).select('password fullName username email createdAt updatedAt');
+    const user = await User.findOne({ email: email }).select('password firstName lastName email referralCode createdAt updatedAt');
   
     if (!user) {
       throw new UnauthenticatedError("User does not exist");
