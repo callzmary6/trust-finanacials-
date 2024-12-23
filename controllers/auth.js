@@ -16,8 +16,8 @@ const register = async (req, res) => {
 
     const user = await User.create({username, fullName, email, password});
     const token = user.createJWT()
-    user.password = undefined;
-    user.__v = undefined;
+    user.password = undefined; // Removes the password from the response
+    user.__v = undefined; // Removes the version (--V) from the response
     return res.status(StatusCodes.CREATED).json({success: true, code: 201, msg: 'Acount created successfully', data: {user, token}});
 }
 
@@ -30,25 +30,34 @@ const login = async (req, res) => {
       throw new BadRequestError("Please provide email and password to login");
     }
   
-    const user = await User.findOne({ email: email }).select('-__v');
+    const user = await User.findOne({ email: email }).select('password fullName username email createdAt updatedAt');
   
     if (!user) {
-      throw new UnauthenticatedError("Invalid email");
+      throw new UnauthenticatedError("User does not exist");
     }
         
     const isPasswordCorrect = await user.comparePasswords(password);
   
     if (!isPasswordCorrect) {
-      throw new UnauthenticatedError("Invalid password");
+      throw new UnauthenticatedError("Password incorrect");
     }
   
     const token = user.createJWT();
-    user.password = undefined;
+    user.password = undefined; // Removes the password from the response
     return res.status(StatusCodes.OK).json({ success: true, code: 200, msg: 'Login successful', data: {user, token} });
   };
 
 
+  // Update the user profile data
+  const updateProfile = async (req, res) => {
+    const {id:userId} = req.user;
+    
+    const updatedUser = await User.findByIdAndUpdate({_id:userId}, req.body, {runValidators: true});
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Profile updated'})
+  }
 
 
 
-module.exports = {register, login};
+
+
+module.exports = {register, login, updateProfile};

@@ -1,15 +1,14 @@
 const {StatusCodes} = require('http-status-codes')
-const {NotFoundError} = require('../errors/not-found')
 
 
 const errorHandlerMiddleware = async (err, req, res, next) => {
     let customError = {
         msg: err.message || 'Something went wrong, please try again later',
         statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-        code: 500
+        code: err.code || 500
     }
 
-    if (err.errorResponse.code == '11000') {
+    if (err.errResponse && err.errorResponse.code == '11000') {
         customError.msg = 'Email already exists!';
         customError.statusCode = StatusCodes.NOT_FOUND;
         customError.code = 404;
