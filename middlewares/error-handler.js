@@ -6,9 +6,9 @@ const errorHandlerMiddleware = async (err, req, res, next) => {
         msg: err.message || 'Something went wrong, please try again later',
         statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
         code: err.code || 500
-    }
+    }    
 
-    if (err.errResponse && err.errorResponse.code == '11000') {
+    if (err.code && err.code == '11000') {
         customError.msg = 'Email already exists!';
         customError.statusCode = StatusCodes.NOT_FOUND;
         customError.code = 404;

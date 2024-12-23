@@ -2,6 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
+const referralCodeGenerator = require('../utils/referral-code-generator');
 
 const UserSchema = mongoose.Schema({
     firstName: {
@@ -12,10 +13,6 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: [true, 'Please provide your last name']
     },
-    // username: {
-    //     type: String,
-    //     required: [true, 'Please provide username']
-    // },
     password: {
         type: String,
         required: [true, 'Please provide password']
@@ -48,6 +45,7 @@ UserSchema.methods.createJWT =  function () {
 UserSchema.pre('save', async function () {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+    this.referralCode = await referralCodeGenerator();
 })
 
 UserSchema.methods.comparePasswords = async function (userPassword) {

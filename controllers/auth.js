@@ -1,20 +1,22 @@
 const User = require('../models/User');
+const Otp = require('../models/Otp');
 const {BadRequestError, UnauthenticatedError} = require('../errors');
 const { StatusCodes } = require('http-status-codes');
-
+const transporter = require('../utils/transporter');
+const bcrypt = require('bcryptjs')
 
 const register = async (req, res) => {
-    const {username, fullName, email, password, password2} = req.body;
+    const {firstName, lastName, email, password, password2} = req.body;
 
-    if (!username || !fullName || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
         throw new BadRequestError('Please provide the necessary fields')
     }
 
     if (password !== password2) {
-        throw new BadRequestError('The passwords do not match!')
+        throw new BadRequestError('Password mismatch')
     }
 
-    const user = await User.create({username, fullName, email, password});
+    const user = await User.create({firstName, lastName, email, password});
     const token = user.createJWT()
     user.password = undefined; // Removes the password from the response
     user.__v = undefined; // Removes the version (--V) from the response
@@ -57,7 +59,76 @@ const login = async (req, res) => {
   }
 
 
+  const sendPasswordOtp = async (req, res) => {
+    const {email} = req.body;
+
+    const user = await User.findOne({email: email});
+
+    let otpCode;
+
+    if (!user) {
+      throw new BadRequestError('User with this email does not exist');
+    }
+
+    const otp = await Otp.findOne({userId: user._id});
+
+    if (otp) {
+      otp.deleteOne();
+    }
+    
+    otpCode = Math.floor(Math.random() * 1000000).toString();
+    await Otp.create({ userId: user._id, userEmail: email, code: otpCode });
+    
+
+    try {
+      const info = await transporter.sendMail({
+        from: '"AcunarTech" <jerrygodson3@gmail.com>',
+        to: email,
+        subject: "Reset your password",
+        text: `Use this code to reset your pasword\n ${otpCode}, \n This code is valid for only 10 minutes`,
+      });
+    } catch (error) {
+      throw new BadRequestError(error);
+      // console.log(error);
+    }
+
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Your otp has been sent to your email'})
+
+  }
+
+  
+  const verifyOtp = async (req, res) => {
+    const {otpCode} = req.body;
+
+    const otp = await Otp.findOne({code: otpCode});
+
+    if (!otp) {
+      throw new BadRequestError('Otp is not correct');
+    }
+
+    if (new Date().getTime() > otp.otpExpiryDate.getTime()){
+      throw new BadRequestError('Opt has expired, request another')
+    }
+
+    await otp.deleteOne()
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Otp correct, change your password'})
+  }
+
+
+  const resetPassword = async (req, res) => {
+    const {email, newPassword} = req.body;
+
+    const salt = await bcrypt.genSalt(10);
+    safePassword = await bcrypt.hash(newPassword, salt);
+
+    const user = await User.updateOne({email:email}, {password: safePassword});
+
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Password updated'});
+  }
 
 
 
-module.exports = {register, login, updateProfile};
+
+
+
+module.exports = {register, login, updateProfile, sendPasswordOtp, verifyOtp, resetPassword};
