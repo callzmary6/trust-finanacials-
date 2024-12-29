@@ -7,12 +7,19 @@ const bcrypt = require('bcryptjs')
 
 const register = async (req, res) => {
     const {firstName, lastName, email, password, referralCode} = req.body;
+    let referredBy = undefined;
 
     if (!firstName || !lastName || !email || !password) {
         throw new BadRequestError('Please provide the necessary fields')
     }
 
-    const user = await User.create({firstName, lastName, email, password});
+    const referral = await User.findOne({referralCode: referralCode});
+
+    if (referral) {
+      referredBy = referral._id;
+    } 
+
+    const user = await User.create({firstName, lastName, email, password, referredBy});
     const token = user.createJWT()
     user.password = undefined; // Removes the password from the response
     user.__v = undefined; // Removes the version (--V) from the response

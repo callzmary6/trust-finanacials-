@@ -25,11 +25,19 @@ const UserSchema = mongoose.Schema({
         lowercase: true,
         match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please provide valid email']
     },
+    balance: {
+        type: Number,
+        default: 0
+    },
     country: String,
     address: String,
     phoneNumber: String,
     profilePicture: String,
-    referralCode: String
+    referralCode: String,
+    referredBy: {
+        ref: 'User', 
+        type: mongoose.Schema.Types.ObjectId,
+    },
 }, {timestamps: true})
 
 
