@@ -8,7 +8,7 @@ const depositFunds = async (req, res) => {
     req.body.user = userId;
 
     const deposit = await Deposit.create(req.body);
-    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Refresh and check your dashboard for funds'});
+    return res.status(StatusCodes.CREATED).json({success: true, code: 201, msg: 'Refresh and check your dashboard for funds'});
 }
 
 

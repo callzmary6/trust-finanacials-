@@ -21,6 +21,9 @@ const register = async (req, res) => {
 
     const user = await User.create({firstName, lastName, email, password, referredBy});
     const token = user.createJWT()
+    if (user.balance) {
+      user.balance = undefined;  // Removes the balance of the user from the response
+    }
     user.password = undefined; // Removes the password from the response
     user.__v = undefined; // Removes the version (--V) from the response
     return res.status(StatusCodes.CREATED).json({success: true, code: 201, msg: 'Acount created successfully', data: {user, token}});
@@ -49,6 +52,9 @@ const login = async (req, res) => {
   
     const token = user.createJWT();
     user.password = undefined; // Removes the password from the response
+    if (user.balance) {
+      user.balance = undefined;  // Removes the balance of the user from the response
+    }
     return res.status(StatusCodes.OK).json({ success: true, code: 200, msg: 'Login successful', data: {user, token} });
   };
 
@@ -130,8 +136,15 @@ const login = async (req, res) => {
   }
 
 
+  const getUserBalance = async (req, res) => {
+    const {id: userId} = req.user
+    const user = await User.findOne({_id: userId});
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User balance', data: {userBalance: user.balance}});
+  }
 
 
 
 
-module.exports = {register, login, updateProfile, sendPasswordOtp, verifyOtp, resetPassword};
+
+
+module.exports = {register, login, updateProfile, sendPasswordOtp, verifyOtp, resetPassword, getUserBalance};
