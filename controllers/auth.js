@@ -68,6 +68,15 @@ const login = async (req, res) => {
   }
 
 
+  const getProfile = async (req, res) => {
+    const {id: userId} = req.user;
+
+    const userProfile = await User.findOne({_id: userId}).select('-_id bitcoinAddress ethereumAddress bitcoinCashAddress usdtERCAddress usdtTRCAddress')
+
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User profile', data: {userProfile}});
+  }
+
+
   const sendPasswordOtp = async (req, res) => {
     const {email} = req.body;
 
@@ -147,4 +156,4 @@ const login = async (req, res) => {
 
 
 
-module.exports = {register, login, updateProfile, sendPasswordOtp, verifyOtp, resetPassword, getUserBalance};
+module.exports = {register, login, updateProfile, sendPasswordOtp, verifyOtp, resetPassword, getUserBalance, getProfile};

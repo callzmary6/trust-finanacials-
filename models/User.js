@@ -27,12 +27,13 @@ const UserSchema = mongoose.Schema({
     },
     balance: {
         type: Number,
-        default: 0
+        default: 5
     },
-    country: String,
-    address: String,
-    phoneNumber: String,
-    profilePicture: String,
+    bitcoinAddress: String,
+    ethereumAddress: String,
+    bitcoinCashAddress: String,
+    usdtERCAddress: String,
+    usdtTRCAddress: String,
     referralCode: String,
     referredBy: {
         ref: 'User', 
