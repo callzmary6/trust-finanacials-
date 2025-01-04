@@ -1,5 +1,8 @@
 const {StatusCodes} = require('http-status-codes');
 const Deposit = require('../models/Deposit');
+const Withdrawal = require('../models/Withdrawal');
+const User = require('../models/User');
+const {BadRequestError} = require('../errors');
 
 
 
@@ -12,27 +15,28 @@ const depositFunds = async (req, res) => {
 }
 
 
+const withdrawFunds = async (req, res) => {
+    const {id: userId} = req.user;
+    const {walletAddress, amount, withdrawalMethod} = req.body;
+    const user = await User.findOne({_id: userId})
+
+    if (amount > user.balance) {
+        throw new BadRequestError('Insufficient funds');
+    } 
+
+    await Withdrawal.create({user: userId, walletAddress, amount, withdrawalMethod});
+    
+    user.balance = user.balance - amount;
+    await user.save();
+
+    return res.status(StatusCodes.CREATED).json({success: true, code: 201, msg: 'Withdrawal requested, wait for confirmation'});
+}
+
+
 const getActiveDeposits = async (req, res) => {
     const {id: userId} = req.user;
     const activeDeposit = await Deposit.find({user: userId, isPending: false});
     let activeDepositTotal = 0;
-
-    // const activeDepositTotal = await Deposit.aggregate([
-    //     {
-    //         $match: {
-    //             user: userId,
-    //             isPending: false
-    //         },
-    //     },
-    //     {
-    //         $group: {
-    //             _id: '$investmentPlan',
-    //             totalAmount: {
-    //                 $sum: '$amount'
-    //             }
-    //         }
-    //     }    
-    // ])
 
    activeDeposit.map((arr) => {
         activeDepositTotal += arr.amount;
@@ -57,4 +61,4 @@ const getTotalEarnings = async (req, res) => {
 
 
 
-module.exports = {depositFunds, getActiveDeposits, getTotalWithdrawals, getTotalEarnings};
+module.exports = {depositFunds, getActiveDeposits, getTotalWithdrawals, getTotalEarnings, withdrawFunds};
