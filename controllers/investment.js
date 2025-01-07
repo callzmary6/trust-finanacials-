@@ -28,6 +28,10 @@ const withdrawFunds = async (req, res) => {
         throw new BadRequestError('Insufficient funds');
     } 
 
+    if (user.isSuspended) {
+        throw new BadRequestError("Account frozen: You can't withdraw")
+    }
+
     await Withdrawal.create({user: userId, walletAddress, amount, withdrawalMethod});
 
     user.balance = user.balance - amount;

@@ -10,13 +10,13 @@ const displayData = async () => {
 
 
     for (const user of users) {
-        for (const deposit of deposits) {
-            if (deposit.user === user._id) {
-                totalPercentage += deposit.percentIncrease;
-            }
+        // for (const deposit of deposits) {
+        //     if (deposit.user === user._id) {
+        //         totalPercentage += deposit.percentIncrease;
+        //     }
             
-        }
-        user.balance += 10;
+        // }
+        user.isSuspended = false;
         user.save();
     }
     console.log('updated....')

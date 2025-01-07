@@ -46,6 +46,10 @@ const UserSchema = mongoose.Schema({
     referralCount: {
         type: Number,
         default: 0
+    },
+    isSuspended: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
 

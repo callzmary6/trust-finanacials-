@@ -21,6 +21,7 @@ const taskJob = require('./utils/update-balance-job'); // check this line
 
 // Admin Routers
 const adminInvestmentRouter = require('./admin/routes/investment');
+const adminAccountRouter = require('./admin/routes/accounts');
 
 app.use(cors());
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/investment", authMiddleware, investmentRouter);
 app.use("/api/v1/admin", adminInvestmentRouter);
+app.use("/api/v1/admin/accounts", adminAccountRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
