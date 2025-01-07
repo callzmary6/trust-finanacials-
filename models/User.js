@@ -39,6 +39,14 @@ const UserSchema = mongoose.Schema({
         ref: 'User', 
         type: mongoose.Schema.Types.ObjectId,
     },
+    // referralBonus: {
+    //     type: Boolean,
+    //     default: false
+    // },
+    referralCount: {
+        type: Number,
+        default: 0
+    }
 }, {timestamps: true})
 
 
@@ -52,10 +60,18 @@ UserSchema.methods.createJWT =  function () {
 }
 
 UserSchema.pre('save', async function () {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    this.referralCode = await referralCodeGenerator();
+    if (this.isModified('password')) {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    }
+    if (this.isModified('referralCode') || !this.referralCode) {
+        this.referralCode = referralCodeGenerator();
+    }
 })
+
+// UserSchema.post('save', async function(doc) {
+
+// })
 
 UserSchema.methods.comparePasswords = async function (userPassword) {
     const isPasswordCorrect = await bcrypt.compare(userPassword, this.password);

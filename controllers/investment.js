@@ -20,12 +20,16 @@ const withdrawFunds = async (req, res) => {
     const {walletAddress, amount, withdrawalMethod} = req.body;
     const user = await User.findOne({_id: userId})
 
+    if (amount < 30) {
+        throw new BadRequestError('Amount must be greater than $30')
+    }
+
     if (amount > user.balance) {
         throw new BadRequestError('Insufficient funds');
     } 
 
     await Withdrawal.create({user: userId, walletAddress, amount, withdrawalMethod});
-    
+
     user.balance = user.balance - amount;
     await user.save();
 
@@ -48,7 +52,15 @@ const getActiveDeposits = async (req, res) => {
 
 
 const getTotalWithdrawals = async (req, res) => {
-    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Total withdrawals', data: {totalWithdrawals: 2000}});
+    const {id: userId} = req.user;
+    const withdrawals = await Withdrawal.find({user: userId, isPending: false});
+    let totalWithdrawals = 0;
+
+    withdrawals.map((arr)=> {
+        totalWithdrawals += arr.amount;
+    });
+
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Total withdrawals', data: {totalWithdrawals}});
 }
 
 

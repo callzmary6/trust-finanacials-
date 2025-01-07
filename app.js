@@ -17,6 +17,8 @@ const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 
+const taskJob = require('./utils/update-balance-job'); // check this line
+
 // Admin Routers
 const adminInvestmentRouter = require('./admin/routes/investment');
 
@@ -37,6 +39,7 @@ const start = async () => {
     app.listen(PORT, () => {
       console.log("Server is active...");
     });
+    // taskJob.start(); // check this line
   } catch (error) {
     console.log(error);
   }
