@@ -39,6 +39,9 @@ const UserSchema = mongoose.Schema({
         ref: 'User', 
         type: mongoose.Schema.Types.ObjectId,
     },
+    referrals: {
+        type: [mongoose.Schema.Types.ObjectId]
+    },
     // referralBonus: {
     //     type: Boolean,
     //     default: false
@@ -74,12 +77,12 @@ UserSchema.pre('save', async function () {
 })
 
 // UserSchema.post('save', async function(doc) {
-
-// })
+    
+// });
 
 UserSchema.methods.comparePasswords = async function (userPassword) {
     const isPasswordCorrect = await bcrypt.compare(userPassword, this.password);
-    return isPasswordCorrect
+    return isPasswordCorrect;
 }
 
 

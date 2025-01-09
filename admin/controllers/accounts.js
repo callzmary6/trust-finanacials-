@@ -12,13 +12,23 @@ const getAllUsers = async (req, res) => {
 const deleteUser = async (req, res) => {
     const {id: userId} = req.params;
     const user = await User.findByIdAndDelete({_id: userId});
-    return res.status(StatusCodes.NO_CONTENT).json({success: true, code: 204, msg: 'User deleted'});
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User account deleted'});
 }
 
 const freezeAccount = async (req, res) => {
     const {id: userId} = req.params;
-    await User.findByIdAndUpdate({_id: userId}, {isSuspended: true})
-    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User account frozen'}); 
+    const user = await User.findOne({_id: userId});
+    var msg = 'User account frozen'
+
+    if (user.isSuspended == false) {
+        user.isSuspended = true;
+    } else {
+        user.isSuspended = false
+        msg = 'User account unfrozen'
+    }
+
+    await user.save()
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: msg}); 
 }
 
 

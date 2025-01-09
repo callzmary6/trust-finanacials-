@@ -15,11 +15,19 @@ const register = async (req, res) => {
 
     const referral = await User.findOne({referralCode: referralCode});
 
-    if (referral) {
-      referredBy = referral._id;
-    } 
-
     const user = await User.create({firstName, lastName, email, password, referredBy});
+
+    // Referral functionality
+    if (referral) {
+      user.referredBy = referral._id // This sets the id of the user's referral
+      await user.save()
+
+      referral.referralCount += 1;
+      referral.referrals.push(user._id);
+
+      await referral.save();
+    }
+
     const token = user.createJWT()
     if (user.balance) {
       user.balance = undefined;  // Removes the balance of the user from the response

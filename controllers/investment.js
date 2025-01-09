@@ -29,7 +29,7 @@ const withdrawFunds = async (req, res) => {
     } 
 
     if (user.isSuspended) {
-        throw new BadRequestError("Account frozen: You can't withdraw")
+        throw new BadRequestError("Account frozen: You can't withdraw");
     }
 
     await Withdrawal.create({user: userId, walletAddress, amount, withdrawalMethod});

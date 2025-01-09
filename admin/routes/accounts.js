@@ -5,7 +5,7 @@ const {getAllUsers, deleteUser, freezeAccount} = require('../controllers/account
 
 
 router.get('/users', getAllUsers);
-router.delete('/delete-user/:id', deleteUser);
+router.post('/delete-user/:id', deleteUser);
 router.post('/freeze-user/:id', freezeAccount);
 
 
