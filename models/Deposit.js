@@ -28,7 +28,15 @@ const DepositSchema = mongoose.Schema({
     isPending: {
         type: Boolean,
         default: true
-    }
+    },
+    duration: {
+        type: Number
+    }, 
+    roi: {
+        type: Number
+    },
+    dailyEarning: Number,
+    daysRemaining: Number
 }, {timestamps: true})
 
 

@@ -41,7 +41,7 @@ const start = async () => {
     app.listen(PORT, () => {
       console.log("Server is active...");
     });
-    // taskJob.start(); // check this line
+    taskJob.start(); // Starts the cron schedule
   } catch (error) {
     console.log(error);
   }

@@ -21,6 +21,7 @@ const deleteUser = async (req, res) => {
     return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User account deleted'});
 }
 
+
 const freezeAccount = async (req, res) => {
     const {id: userId} = req.params;
     const user = await User.findOne({_id: userId});
@@ -38,5 +39,16 @@ const freezeAccount = async (req, res) => {
 }
 
 
+const getRefferals = async (req, res) => {
+    const users = await User.find({}).select('firstName lastName referralCount referredBy referrals').populate({
+        path: 'referrals',
+        select: 'firstName lastName referralCount'
+    });
 
-module.exports = {getAllUsers, deleteUser, freezeAccount};
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'Referral list', data: {users}});
+};
+
+
+
+
+module.exports = {getAllUsers, deleteUser, freezeAccount, getRefferals};

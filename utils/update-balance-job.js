@@ -1,33 +1,46 @@
 const User = require('../models/User');
 const cron = require('node-cron');
 const Deposit = require('../models/Deposit');
-const Withdrawal = require('../models/Withdrawal');
 
 
-const displayData = async () => {
-    const users = await User.find({});
-    const deposits = await Deposit.find({isPending: false});
-    const withdrawals = await Withdrawal.find({isPending: false});
+const updateBalance = async () => {
+    try {
+        const deposits = await Deposit.find({isPending: false, daysRemaining: {$gt: 0}});
 
-    var totalPercentage = 0;
+        for (const deposit of deposits) {
+            const user = await User.findOne({_id: deposit.user});
 
+            if (!user) continue;
 
-    for (const user of withdrawals) {
-        // for (const deposit of deposits) {
-        //     if (deposit.user === user._id) {
-        //         totalPercentage += deposit.percentIncrease;
-        //     }
-            
-        // }
-        user.isPending = true;
-        user.save();
+            // Add daily earning's to user's balance
+            user.balance += deposit.dailyEarning;
+            await user.save();
+
+            // Update referral's balance
+            if (user.referredBy) {
+                const referrer = await User.findOne({_id: user.referredBy});
+                if (referrer) {
+                    referrer.balance += deposit.dailyEarning * 0.1;
+                    await referrer.save();
+                }
+            }
+
+            // Reduce the number of days
+            deposit.daysRemaining -= 1;
+            await deposit.save();
+
+            console.log('updated....');
+        }
+    } catch (error) {
+        console.log(`Error during daily updates: ${error}`)
     }
-    console.log('updated....')
 }
 
 
 
-const task = cron.schedule('*/10 * * * * *', displayData, {scheduled: false});
+const task = cron.schedule('0 0 * * *', updateBalance, {scheduled: false});
+
+
 
 
 module.exports = task;

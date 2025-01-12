@@ -15,7 +15,7 @@ const register = async (req, res) => {
 
     const referral = await User.findOne({referralCode: referralCode});
 
-    const user = await User.create({firstName, lastName, email, password, referredBy});
+    const user = await User.create({firstName, lastName, email, password});
 
     // Referral functionality
     if (referral) {
@@ -156,7 +156,7 @@ const login = async (req, res) => {
   const getUserBalance = async (req, res) => {
     const {id: userId} = req.user
     const user = await User.findOne({_id: userId});
-    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User balance', data: {userBalance: user.balance}});
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User balance', data: {userBalance: user.balance, referralCount: user.referralCount}});
   }
 
 
