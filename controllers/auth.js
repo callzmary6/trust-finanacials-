@@ -157,7 +157,7 @@ const login = async (req, res) => {
     const {id: userId} = req.user
     const user = await User.findOne({_id: userId});
     return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User balance', data: {userBalance: user.balance, referralCount: user.referralCount}});
-  }
+}
 
 
 

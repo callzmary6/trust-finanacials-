@@ -49,6 +49,15 @@ const getRefferals = async (req, res) => {
 };
 
 
+const addFunds = async (req, res) => {
+    const {id: userId} = req.params;
+    const {amount} = req.body;
+
+    await User.findByIdAndUpdate(userId, {$inc: {balance: amount}});
+    return res.status(StatusCodes.OK).json({success: true, code: 200, msg: 'User balance updated'});
+}
 
 
-module.exports = {getAllUsers, deleteUser, freezeAccount, getRefferals};
+
+
+module.exports = {getAllUsers, deleteUser, freezeAccount, getRefferals, addFunds};
